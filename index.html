@@ -50,22 +50,19 @@
             
             <section id="screen-form" class="card custom-card p-4 shadow-sm mb-4">
                 <h2 class="h5 fw-bold mb-4 text-dark text-opacity-75">Новое гастро-открытие</h2>
-                <form id="food-form">
+              <form id="food-form">
                     <input type="hidden" id="edit-food-id" value="">
                     
-                    <!-- НАЗВАНИЕ (Обязательное) -->
                     <div class="mb-3">
                         <label for="title" class="form-label small fw-bold text-muted text-uppercase">Название блюда *</label>
                         <input type="text" id="title" class="form-control" required placeholder="Например, Римская пицца">
                     </div>
 
-                    <!-- МЕСТО / РЕСТОРАН (Опциональное) -->
                     <div class="mb-3">
                         <label for="place" class="form-label small fw-bold text-muted text-uppercase">Где пробовали:</label>
                         <input type="text" id="place" class="form-control" placeholder="Например, ресторан 'Римские каникулы'">
                     </div>
 
-                    <!-- ОЦЕНКА -->
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <label for="rating" class="form-label small fw-bold text-muted text-uppercase m-0">Ваша оценка:</label>
@@ -74,7 +71,6 @@
                         <input type="range" id="rating" class="form-range" min="1" max="10" step="0.5" value="5">
                     </div>
 
-                    <!-- ТЕГИ -->
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted text-uppercase">Теги:</label>
                         <div id="tags-container" class="form-control d-flex flex-wrap align-items-center gap-1" style="cursor: text; min-height: 46px;">
@@ -82,19 +78,9 @@
                         </div>
                     </div>
 
-                    <!-- ЗАМЕТКА -->
-                    <div class="mb-3">
-                        <label for="comment" class="form-label small fw-bold text-muted text-uppercase">Заметка:</label>
-                        <textarea id="comment" class="form-control" rows="2" placeholder="Опишите ваши впечатления..."></textarea>
-                    </div>
-
-                    <!-- ЗАГРУЗКА ИЗОБРАЖЕНИЯ -->
                     <div class="mb-4">
-                        <label class="form-label small fw-bold text-muted text-uppercase">Фото блюда:</label>
-                        <input type="file" id="image-input" class="form-control" accept="image/*">
-                        <div id="image-preview-container" class="mt-2 hidden">
-                            <img id="image-preview" src="" alt="Превью" class="img-thumbnail" style="max-height: 150px;">
-                        </div>
+                        <label for="comment" class="form-label small fw-bold text-muted text-uppercase">Заметка:</label>
+                        <textarea id="comment" class="form-control" rows="3" placeholder="Опишите ваши впечатления..."></textarea>
                     </div>
 
                     <button type="submit" id="submit-btn" class="btn btn-brand w-100 py-2.5 fs-6">Сохранить в каталог</button>

@@ -18,13 +18,6 @@ import {
     signOut, 
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-// Добавляем импорт хранилища для картинок
-import { 
-    getStorage, 
-    ref, 
-    uploadBytes, 
-    getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 // --- ТВОЙ КОНФИГ Firebase ---
 const firebaseConfig = {
@@ -40,7 +33,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const storage = getStorage(app); // Хранилище картинок
 const provider = new GoogleAuthProvider();
 const foodCollection = collection(db, "foods");
 
@@ -50,7 +42,6 @@ let currentFilter = null;
 let currentUser = null; 
 let unsubscribeSnapshot = null; 
 let currentFormTags = []; 
-let existingImageUrl = ""; // Хранение URL картинки при редактировании
 
 // --- ДОМ-ЭЛЕМЕНТЫ ---
 const screenWelcome = document.getElementById('screen-welcome');
@@ -81,11 +72,6 @@ const tagsContainer = document.getElementById('tags-container');
 const tagInput = document.getElementById('tag-input');
 const searchInput = document.getElementById('search-input');
 const sortSelect = document.getElementById('sort-select');
-
-// Новые DOM-элементы для фото и места
-const imageInput = document.getElementById('image-input');
-const imagePreviewContainer = document.getElementById('image-preview-container');
-const imagePreview = document.getElementById('image-preview');
 
 // --- ЛОГИКА АВТОРИЗАЦИИ ---
 async function login() {
@@ -169,28 +155,10 @@ ratingInput.addEventListener('input', (e) => {
     ratingValue.textContent = e.target.value;
 });
 
-// Локальное превью выбранного фото
-imageInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            imagePreview.src = event.target.result;
-            imagePreviewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    } else {
-        imagePreviewContainer.classList.add('hidden');
-    }
-});
-
 function resetFormMode() {
     foodForm.reset();
     editIdInput.value = '';
     currentFormTags = []; 
-    existingImageUrl = "";
-    imagePreviewContainer.classList.add('hidden');
-    imagePreview.src = "";
     renderFormChips();    
     submitBtn.textContent = 'Сохранить в каталог';
     submitBtn.className = 'btn btn-brand w-100 py-2.5 fs-6';
@@ -230,7 +198,7 @@ function renderFormChips() {
         tagsContainer.insertBefore(chip, tagInput);
     });
     
-    tagInput.placeholder = currentFormTags.length > 0 ? "" : "Напишите тег и нажмите запятую...";
+    tagInput.placeholder = currentFormTags.length > 0 ? "" : "Напишите тег и нажмите запятую..." ;
 }
 
 tagsContainer.addEventListener('click', () => tagInput.focus());
@@ -262,29 +230,11 @@ foodForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUser) return; 
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Сохранение...';
-
     const title = document.getElementById('title').value;
     const place = document.getElementById('place').value.trim();
     const rating = parseFloat(ratingInput.value);
     const comment = document.getElementById('comment').value;
     const editId = editIdInput.value;
-    const imageFile = imageInput.files[0];
-
-    let imageUrl = existingImageUrl;
-
-    // Загрузка фото в Firebase Storage, если файл выбран
-    if (imageFile) {
-        try {
-            const storageRef = ref(storage, `users/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
-            const snapshot = await uploadBytes(storageRef, imageFile);
-            imageUrl = await getDownloadURL(snapshot.ref);
-        } catch (error) {
-            console.error("Ошибка загрузки фото: ", error);
-            alert("Не удалось загрузить фотографию, сохраняем без неё.");
-        }
-    }
 
     const foodData = {
         title,
@@ -292,7 +242,6 @@ foodForm.addEventListener('submit', async (e) => {
         rating,
         tags: currentFormTags, 
         comment,
-        imageUrl,
         userId: currentUser.uid
     };
 
@@ -308,7 +257,6 @@ foodForm.addEventListener('submit', async (e) => {
         alert("Не удалось сохранить данные.");
     }
 
-    submitBtn.disabled = false;
     resetFormMode();
     navListBtn.click();
 });
@@ -322,7 +270,7 @@ function renderCards() {
         processedList = processedList.filter(food => food.tags.includes(currentFilter));
     }
 
-    // Живой поиск: теперь ищет по Названию, Заметке ИЛИ Месту/Ресторану
+    // Живой поиск: ищет по Названию, Заметке или Месту
     const searchQuery = searchInput.value.trim().toLowerCase();
     if (searchQuery) {
         processedList = processedList.filter(food => {
@@ -380,7 +328,6 @@ function renderCards() {
         const tagsHTML = food.tags.map(tag => `<span class="badge tag-custom me-1 tag-clickable" data-tag="${tag}">#${tag}</span>`).join('');
 
         card.innerHTML = `
-            ${food.imageUrl ? `<div class="card-image-wrapper"><img src="${food.imageUrl}" alt="${food.title}" loading="lazy"></div>` : ''}
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
                     <h5 class="mb-1 fw-bold text-dark" style="letter-spacing: -0.3px; line-height: 1.4;">${food.title}</h5>
@@ -407,7 +354,7 @@ function renderCards() {
         });
     });
 
-    // Клик по названию места подставляет его в строку поиска
+    // Клик по названию места автоматически подставляет его в поиск
     cardsContainer.querySelectorAll('.card-place-info').forEach(placeEl => {
         placeEl.addEventListener('click', (e) => {
             const placeName = e.currentTarget.getAttribute('data-place');
@@ -451,14 +398,6 @@ function editFood(id) {
     renderFormChips();
     
     document.getElementById('comment').value = foodToEdit.comment || '';
-
-    existingImageUrl = foodToEdit.imageUrl || "";
-    if (existingImageUrl) {
-        imagePreview.src = existingImageUrl;
-        imagePreviewContainer.classList.remove('hidden');
-    } else {
-        imagePreviewContainer.classList.add('hidden');
-    }
 
     submitBtn.textContent = 'Обновить данные блюда';
     submitBtn.className = 'btn btn-brand w-100 py-2.5 fs-6';
