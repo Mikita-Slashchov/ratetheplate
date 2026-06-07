@@ -1,0 +1,451 @@
+/* ==========================================================================
+   1. ПЕРЕМЕННЫЕ И ГЛОБАЛЬНЫЕ СТИЛИ (ТЕМИЗАЦИЯ)
+   ========================================================================== */
+:root {
+    --brand-color: #ff6b6b;
+    /* Светлая тема по умолчанию */
+    --bg-main: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --border-color: #dee2e6;
+    --bg-input: #ffffff;
+    --bg-tabs-container: rgba(0, 0, 0, 0.04);
+    --placeholder-color: #95a5a6;
+}
+
+/* Переменные для тёмной темы */
+[data-theme="dark"] {
+    --bg-main: #121212 !important;
+    --bg-card: #1e1e1e !important;
+    --text-main: #f5f6fa !important;
+    --text-muted: #a4b0be !important;
+    --border-color: #2f3640 !important;
+    --bg-input: #2f3640 !important;
+    --bg-tabs-container: rgba(255, 255, 255, 0.08) !important;
+    --placeholder-color: #718093 !important;
+}
+
+/* Жестко привязываем body к переменной фона */
+html, body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Исправляем все заголовки и тексты */
+h1, h2, h3, h4, h5, span, p, label, .text-dark, .navbar-brand {
+    color: var(--text-main) !important;
+    transition: color 0.3s ease;
+}
+
+/* Фикс для приглушенных классов Bootstrap в разных темах */
+.text-muted, .text-opacity-75 {
+    color: var(--text-muted) !important;
+}
+
+input, select, textarea {
+    color: var(--text-main) !important;
+    background-color: var(--bg-input) !important;
+}
+
+/* Стилизация placeholder для всех браузеров */
+input::placeholder, textarea::placeholder {
+    color: var(--placeholder-color) !important;
+    opacity: 1 !important;
+}
+:-ms-input-placeholder { color: var(--placeholder-color) !important; }
+::-ms-input-placeholder { color: var(--placeholder-color) !important; }
+
+/* Фикс для списков на экране аналитики */
+.list-group-item {
+    background-color: transparent !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   2. ШАПКА И НАВИГАЦИЯ (АДАПТИВНЫЕ ТАБЫ)
+   ========================================================================== */
+.custom-navbar {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 12px 0;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.navbar-brand-custom {
+    font-weight: 800;
+    color: var(--brand-color) !important;
+    letter-spacing: -0.5px;
+}
+
+/* Кнопки переключения вкладок */
+.nav-link-custom {
+    font-weight: 600;
+    color: var(--text-muted) !important;
+    border-radius: 20px;
+    padding: 8px 12px !important;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.nav-link-custom:hover {
+    color: var(--brand-color) !important;
+}
+
+.nav-link-custom.active {
+    color: #fff !important;
+    background: var(--brand-color) !important;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);
+}
+
+/* Контейнер-подложка для табов */
+.nav-tabs-container {
+    background-color: var(--bg-tabs-container) !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Переключатель темы */
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   3. КОМПОНЕНТЫ ФОРМЫ И ИНПУТЫ
+   ========================================================================== */
+.btn-brand {
+    background-color: var(--brand-color) !important;
+    border-color: var(--brand-color) !important;
+    color: #fff !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-brand:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.form-control, .form-select {
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+    border-radius: 8px;
+    padding: 10px 14px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15) !important;
+}
+
+/* Полная кастомизация слайдера оценки */
+.form-range {
+    background: transparent !important;
+}
+/* Ползунок (круг) */
+.form-range::-webkit-slider-thumb {
+    background-color: var(--brand-color) !important;
+    border: 2px solid var(--bg-card) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.form-range::-moz-range-thumb {
+    background-color: var(--brand-color) !important;
+    border: 2px solid var(--bg-card) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+/* Дорожка (линия трека) */
+.form-range::-webkit-slider-runnable-track {
+    background-color: var(--border-color) !important;
+    height: 6px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+.form-range::-moz-range-track {
+    background-color: var(--border-color) !important;
+    height: 6px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+/* Интерактивное поле тегов (Контейнер под фокусом) */
+#tags-container.focused {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15) !important;
+}
+
+/* Блочки тегов (Chips) внутри инпута формы */
+.form-tag-chip {
+    background-color: var(--brand-color) !important;
+    color: #ffffff !important; /* Делаем текст всегда белым на коралловом фоне */
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    animation: fadeIn 0.15s ease;
+}
+
+/* Явно указываем, что внутренний текст чипса тоже белый */
+.form-tag-chip span {
+    color: #ffffff !important;
+}
+
+.form-tag-chip .btn-close-tag {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.9) !important; /* Крестик тоже белый и контрастный */
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.1s ease;
+}
+
+.form-tag-chip .btn-close-tag:hover {
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   4. ПАНЕЛЬ ПОИСКА И СОРТИРОВКИ
+   ========================================================================== */
+.custom-search-wrapper {
+    height: 46px;
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-color) !important;
+    transition: all 0.2s ease;
+}
+
+.custom-search-wrapper:focus-within {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15) !important;
+}
+
+.custom-select-height {
+    height: 46px;
+    border-radius: 8px !important;
+}
+
+/* ==========================================================================
+   5. КАРТОЧКИ БЛЮД И ТЕГИ В СПИСКЕ
+   ========================================================================== */
+.custom-card {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ОТДЕЛЬНЫЙ класс для карточек в списке блюд, которые должны реагировать на наведение */
+.food-item-card {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.food-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Теги на карточках */
+.tag-custom {
+    background-color: var(--bg-main) !important;
+    color: var(--brand-color) !important;
+    border: 1px solid var(--border-color);
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+    font-weight: 600;
+    font-size: 0.8rem !important;
+    transition: all 0.15s ease;
+    display: inline-block;
+    margin-bottom: 6px; /* Добавляем вертикальный отступ, чтобы теги не слипались при переносе */
+}
+
+.tag-clickable {
+    cursor: pointer;
+}
+
+.tag-clickable:hover {
+    background-color: var(--brand-color) !important;
+    color: #fff !important;
+    border-color: var(--brand-color);
+}
+
+/* Кастомный бейдж оценки (звёздочка) */
+.rating-badge-custom {
+    background-color: #fff0f0 !important;
+    color: var(--brand-color) !important;
+    border: 1px solid #ffe3e3;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    font-weight: 700;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease;
+}
+
+/* Адаптация бейджа оценки под тёмную тему */
+[data-theme="dark"] .rating-badge-custom {
+    background-color: #2f1f1f !important;
+    border-color: #4a2727;
+}
+
+/* --- НОВЫЕ КНОПКИ УПРАВЛЕНИЯ КАРТОЧКОЙ ДЛЯ МОБИЛОК И ДЕСКТОПА --- */
+.card-actions-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-card-action {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Кнопка Редактировать (акцентная, под брендовый цвет) */
+.btn-card-edit {
+    background-color: rgba(255, 107, 107, 0.1) !important;
+    color: var(--brand-color) !important;
+    flex-grow: 1; /* Растягивается */
+}
+.btn-card-edit:hover {
+    background-color: var(--brand-color) !important;
+    color: #fff !important;
+}
+
+/* Кнопка Удалить (нейтральная, серенькая, чтобы не кликнуть случайно) */
+.btn-card-delete {
+    background-color: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-muted) !important;
+}
+.btn-card-delete:hover {
+    background-color: #eb4d4b !important;
+    color: #fff !important;
+    border-color: #eb4d4b !important;
+}
+
+/* Адаптив: на мобилках выстраиваем кнопки в стопку на всю ширину */
+@media (max-width: 576px) {
+    .card-actions-container {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .btn-card-action {
+        width: 100%;
+        padding: 10px 16px; /* Чуть увеличиваем высоту для удобства нажатия пальцем */
+    }
+}
+
+/* Специальные кастомные блоки статистики для экрана Аналитики */
+.stat-card-custom {
+    background-color: var(--bg-main) !important;
+    border: 1px solid var(--border-color) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Сервисный класс для блокировки мигания при смене темы */
+.no-transition {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+.no-transition * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+
+/* ==========================================================================
+   6. АНИМАЦИИ И МЕДИА-ЗАПРОСЫ
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand-custom {
+        font-size: 1.3rem;
+    }
+    .nav-link-custom {
+        font-size: 0.85rem;
+        padding: 8px 6px !important;
+    }
+}
+
+/* ==========================================================================
+   7. ИЗОБРАЖЕНИЯ И ЛОКАЦИИ В КАРТОЧКАХ
+   ========================================================================== */
+/* Контейнер для фото в карточке */
+.card-image-wrapper {
+    width: 100%;
+    height: 200px; /* Фиксированная высота, чтобы не рвать шаблон */
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    background-color: var(--bg-main);
+}
+
+.card-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Картинка масштабируется и заполняет блок без искажений пропорций */
+    transition: transform 0.3s ease;
+}
+
+.custom-card:hover .card-image-wrapper img {
+    transform: scale(1.03); /* Легкий интерактивный зум при наведении на карточку */
+}
+
+/* Стиль для отображения места */
+.card-place-info {
+    font-size: 0.85rem;
+    color: var(--brand-color);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: rgba(255, 107, 107, 0.05);
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.card-place-info:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+}

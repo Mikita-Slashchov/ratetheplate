@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍽️ RateThePlate — Твой гастро-каталог</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand custom-navbar sticky-top mb-4">
+        <div class="container d-flex flex-column gap-2" style="max-width: 650px;">
+            
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <span class="navbar-brand navbar-brand-custom mb-0 h1">🍽️ RateThePlate</span>
+                
+                <div class="d-flex align-items-center gap-2">
+                    <button id="theme-toggle" class="theme-toggle-btn" title="Переключить тему">🌓</button>
+                    
+                    <button id="btn-login" class="btn btn-sm btn-brand px-3 py-1.5 rounded-pill">Войти с Google</button>
+                    <button id="btn-logout" class="btn btn-sm btn-outline-secondary rounded-pill px-3 hidden">Выйти</button>
+                </div>
+            </div>
+            
+            <div id="auth-nav-links" class="w-100 hidden">
+                <div class="nav-tabs-container d-flex gap-1 p-1 rounded-pill w-100 justify-content-between">
+                    <button id="nav-form-btn" class="nav-link nav-link-custom active btn btn-link flex-grow-1 text-center">Добавить</button>
+                    <button id="nav-list-btn" class="nav-link nav-link-custom btn btn-link flex-grow-1 text-center">Мои блюда</button>
+                    <button id="nav-stats-btn" class="nav-link nav-link-custom btn btn-link flex-grow-1 text-center">Аналитика</button>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <main class="container" style="max-width: 650px;">
+        
+        <section id="screen-welcome" class="card custom-card p-5 text-center shadow-sm">
+            <h2 class="fw-bold mb-3">Добро пожаловать в RateThePlate! 🍽️</h2>
+            <p class="text-muted mb-4">Открывайте новые вкусы, ведите личный гастрономический дневник, ставьте оценки и синхронизируйте свои блюда между всеми устройствами.</p>
+            <button id="btn-login-welcome" class="btn btn-brand py-2.5 px-4 fs-6">Войти через Google-аккаунт</button>
+        </section>
+
+        <div id="app-content" class="hidden">
+            
+            <section id="screen-form" class="card custom-card p-4 shadow-sm mb-4">
+                <h2 class="h5 fw-bold mb-4 text-dark text-opacity-75">Новое гастро-открытие</h2>
+                <form id="food-form">
+                    <input type="hidden" id="edit-food-id" value="">
+                    
+                    <!-- НАЗВАНИЕ (Обязательное) -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label small fw-bold text-muted text-uppercase">Название блюда *</label>
+                        <input type="text" id="title" class="form-control" required placeholder="Например, Римская пицца">
+                    </div>
+
+                    <!-- МЕСТО / РЕСТОРАН (Опциональное) -->
+                    <div class="mb-3">
+                        <label for="place" class="form-label small fw-bold text-muted text-uppercase">Где пробовали:</label>
+                        <input type="text" id="place" class="form-control" placeholder="Например, ресторан 'Римские каникулы'">
+                    </div>
+
+                    <!-- ОЦЕНКА -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="rating" class="form-label small fw-bold text-muted text-uppercase m-0">Ваша оценка:</label>
+                            <span id="rating-value" class="rating-badge-custom badge">5</span>
+                        </div>
+                        <input type="range" id="rating" class="form-range" min="1" max="10" step="0.5" value="5">
+                    </div>
+
+                    <!-- ТЕГИ -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Теги:</label>
+                        <div id="tags-container" class="form-control d-flex flex-wrap align-items-center gap-1" style="cursor: text; min-height: 46px;">
+                            <input type="text" id="tag-input" placeholder="Напишите тег и нажмите запятую..." style="border: none; outline: none; flex-grow: 1; min-width: 150px; padding: 0; background: transparent;">
+                        </div>
+                    </div>
+
+                    <!-- ЗАМЕТКА -->
+                    <div class="mb-3">
+                        <label for="comment" class="form-label small fw-bold text-muted text-uppercase">Заметка:</label>
+                        <textarea id="comment" class="form-control" rows="2" placeholder="Опишите ваши впечатления..."></textarea>
+                    </div>
+
+                    <!-- ЗАГРУЗКА ИЗОБРАЖЕНИЯ -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Фото блюда:</label>
+                        <input type="file" id="image-input" class="form-control" accept="image/*">
+                        <div id="image-preview-container" class="mt-2 hidden">
+                            <img id="image-preview" src="" alt="Превью" class="img-thumbnail" style="max-height: 150px;">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn btn-brand w-100 py-2.5 fs-6">Сохранить в каталог</button>
+                </form>
+            </section>
+
+            <div id="screen-list" class="hidden">
+                <div class="row g-2 mb-3">
+                    <div class="col-12 col-sm-7">
+                        <div class="custom-search-wrapper d-flex align-items-center px-3 border rounded-3">
+                            <span class="text-muted me-2">🔍</span>
+                            <input type="text" id="search-input" class="w-100" placeholder="Поиск по названию или комментарию..." style="border: none; outline: none; padding: 10px 0; background: transparent;">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-5">
+                        <select id="sort-select" class="form-select custom-select-height text-muted">
+                            <option value="newest">📅 Сначала новые</option>
+                            <option value="oldest">📅 Сначала старые</option>
+                            <option value="rating-desc">⭐ Высший балл</option>
+                            <option value="rating-asc">⭐ Низший балл</option>
+                            <option value="alphabet">🔤 По алфавиту</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="cards-container"></div>
+            </div>
+
+            <section id="screen-stats" class="card custom-card p-4 shadow-sm hidden">
+                <h2 class="h5 fw-bold mb-4 text-dark text-opacity-75">Статистика и Топы</h2>
+                <div id="stats-container" class="mb-4"></div>
+                <h3 class="h6 fw-bold text-muted text-uppercase mb-3 mt-4">⭐ Топ-3 лучших открытий</h3>
+                <div id="top-dishes-container" class="list-group list-group-flush"></div>
+            </section>
+        </div>
+        
+    </main>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
