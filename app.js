@@ -251,6 +251,8 @@ function formatTagText(text) {
     return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
+// --- ОБНОВЛЕННЫЕ СЛУШАТЕЛИ ДЛЯ ТЕГОВ В APP.JS ---
+
 function renderFormChips() {
     const chips = tagsContainer.querySelectorAll('.form-tag-chip');
     chips.forEach(chip => chip.remove());
@@ -277,27 +279,41 @@ function renderFormChips() {
         tagsContainer.insertBefore(chip, tagInput);
     });
     
-    tagInput.placeholder = currentFormTags.length > 0 ? "" : "Напишите тег и нажмите запятую...";
+    // Делаем плейсхолдер более чистым и лаконичным
+    tagInput.placeholder = currentFormTags.length > 0 ? "" : "Например: #Завтрак, #Острое...";
 }
 
 tagsContainer.addEventListener('click', () => tagInput.focus());
 tagInput.addEventListener('focus', () => tagsContainer.classList.add('focused'));
 tagInput.addEventListener('blur', () => tagsContainer.classList.remove('focused'));
 
+// Функция для создания тега из текста в инпуте
+function createTagFromInput() {
+    const rawText = tagInput.value.replace(',', '');
+    const formattedTag = formatTagText(rawText);
+    if (formattedTag && !currentFormTags.includes(formattedTag)) {
+        currentFormTags.push(formattedTag);
+    }
+    tagInput.value = ''; 
+    renderFormChips();  
+}
+
 tagInput.addEventListener('input', () => {
-    const value = tagInput.value;
-    if (value.includes(',')) {
-        const rawText = value.replace(',', '');
-        const formattedTag = formatTagText(rawText);
-        if (formattedTag && !currentFormTags.includes(formattedTag)) {
-            currentFormTags.push(formattedTag);
-        }
-        tagInput.value = ''; 
-        renderFormChips();   
+    // По-прежнему ловим запятую
+    if (tagInput.value.includes(',')) {
+        createTagFromInput();
     }
 });
 
 tagInput.addEventListener('keydown', (e) => {
+    // Добавляем обработку Enter
+    if (e.key === 'Enter') {
+        e.preventDefault(); // Запрещаем отправку всей формы при нажатии Enter в этом поле
+        if (tagInput.value.trim() !== '') {
+            createTagFromInput();
+        }
+    }
+    // Удаление последнего тега по Backspace
     if (e.key === 'Backspace' && tagInput.value === '') {
         currentFormTags.pop(); 
         renderFormChips();     
