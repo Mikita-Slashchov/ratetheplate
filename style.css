@@ -471,3 +471,34 @@ input::placeholder, textarea::placeholder {
 .text-brand {
     color: var(--brand-color) !important;
 }
+
+/* Стилизация инпута оценки под бейдж */
+input.rating-badge-custom {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #ffe3e3;
+    outline: none;
+    background-color: #fff0f0 !important;
+    color: var(--brand-color) !important;
+    padding: 4px 8px !important;
+    border-radius: 20px !important;
+    font-weight: 700;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease;
+}
+
+/* Адаптация инпута оценки под тёмную тему */
+[data-theme="dark"] input.rating-badge-custom {
+    background-color: #2f1f1f !important;
+    border-color: #4a2727;
+}
+
+/* Прячем стандартные стрелочки увеличения/уменьшения у инпута */
+input.rating-badge-custom::-webkit-outer-spin-button,
+input.rating-badge-custom::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input.rating-badge-custom[type=number] {
+    -moz-appearance: textfield;
+}

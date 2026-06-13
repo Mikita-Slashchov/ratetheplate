@@ -64,7 +64,7 @@ const foodForm = document.getElementById('food-form');
 const editIdInput = document.getElementById('edit-food-id');
 const submitBtn = document.getElementById('submit-btn');
 const ratingInput = document.getElementById('rating');
-const ratingValue = document.getElementById('rating-value');
+const ratingValueInput = document.getElementById('rating-value-input');
 const cardsContainer = document.getElementById('cards-container');
 const statsContainer = document.getElementById('stats-container');
 const topDishesContainer = document.getElementById('top-dishes-container');
@@ -235,9 +235,30 @@ navListBtn.addEventListener('click', () => {
     renderCards(); 
 });
 
-// Слайдер оценки
+// 1. Двигаем слайдер -> меняется значение в инпуте
 ratingInput.addEventListener('input', (e) => {
-    ratingValue.textContent = e.target.value;
+    ratingValueInput.value = e.target.value;
+});
+
+// 2. Пишем руками в инпут -> двигается слайдер + валидация границ (1 - 10)
+ratingValueInput.addEventListener('input', (e) => {
+    let val = parseFloat(e.target.value);
+    
+    if (isNaN(val)) return; // Если инпут пустой (в процессе ввода), ничего не делаем
+
+    // Зажимаем значение в рамки от 1 до 10
+    if (val > 10) { val = 10; ratingValueInput.value = 10; }
+    if (val < 1) { val = 1; ratingValueInput.value = 1; }
+
+    ratingInput.value = val;
+});
+
+// Округляем до 1 знака после запятой, когда пользователь уводит фокус с инпута
+ratingValueInput.addEventListener('blur', (e) => {
+    let val = parseFloat(e.target.value);
+    if (isNaN(val) || val < 1) val = 5;
+    ratingValueInput.value = val.toFixed(1);
+    ratingInput.value = val;
 });
 
 function resetFormMode() {
@@ -247,7 +268,7 @@ function resetFormMode() {
     renderFormChips();    
     submitBtn.textContent = 'Сохранить в каталог';
     submitBtn.className = 'btn btn-brand w-100 py-2.5 fs-6';
-    ratingValue.textContent = '5';
+   ratingValueInput.value = '5.0';
 }
 
 // --- ИНТЕРАКТИВНЫЕ ТЕГИ ---
@@ -500,7 +521,7 @@ function editFood(id) {
     document.getElementById('title').value = foodToEdit.title;
     document.getElementById('place').value = foodToEdit.place || '';
     ratingInput.value = foodToEdit.rating;
-    ratingValue.textContent = foodToEdit.rating;
+    ratingValueInput.value = foodToEdit.rating.toFixed(1);
     
     currentFormTags = [...foodToEdit.tags];
     renderFormChips();
