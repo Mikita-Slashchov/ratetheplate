@@ -88,26 +88,38 @@
             </section>
 
             <div id="screen-list" class="hidden">
-                <div class="row g-2 mb-3">
-                    <div class="col-12 col-sm-7">
-                        <div class="custom-search-wrapper d-flex align-items-center px-3 border rounded-3">
-                            <span class="text-muted me-2">🔍</span>
-                            <input type="text" id="search-input" class="w-100" placeholder="Поиск по названию или комментарию..." style="border: none; outline: none; padding: 10px 0; background: transparent;">
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-5">
-                        <select id="sort-select" class="form-select custom-select-height text-muted">
-                            <option value="newest">📅 Сначала новые</option>
-                            <option value="oldest">📅 Сначала старые</option>
-                            <option value="rating-desc">⭐ Высший балл</option>
-                            <option value="rating-asc">⭐ Низший балл</option>
-                            <option value="alphabet">🔤 По алфавиту</option>
-                        </select>
+            <div id="share-mode-badge" class="alert alert-info d-flex justify-content-between align-items-center mb-3 hidden">
+                <span class="fw-bold">👁️ Вы просматриваете чужой гастро-каталог</span>
+                <button id="btn-exit-share" class="btn btn-sm btn-outline-primary">В мой каталог</button>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h4 class="m-0 fw-bold">Мои блюда</h4>
+                <button id="btn-share-catalog" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2">
+                    🔗 Поделиться списком
+                </button>
+            </div>
+
+            <div class="row g-2 mb-4">
+                <div class="col-12 col-md-8">
+                    <div class="input-group custom-search-wrapper rounded-3 px-3 d-flex align-items-center border">
+                        <span class="text-muted me-2">🔍</span>
+                        <input type="text" id="search-input" class="form-control border-0 p-0" style="background:transparent!important; box-shadow:none!important;" placeholder="Поиск по названию, заметке или месту...">
                     </div>
                 </div>
-
-                <div id="cards-container"></div>
+                <div class="col-12 col-md-4">
+                    <select id="sort-select" class="form-select custom-search-wrapper custom-select-height">
+                        <option value="newest">Сначала новые</option>
+                        <option value="oldest">Сначала старые</option>
+                        <option value="rating-desc">Рейтинг: по убыванию</option>
+                        <option value="rating-asc">Рейтинг: по возрастанию</option>
+                        <option value="alphabet">По алфавиту (А-Я)</option>
+                    </select>
+                </div>
             </div>
+
+            <div id="cards-container"></div>
+        </div>
 
             <section id="screen-stats" class="card custom-card p-4 shadow-sm hidden">
                 <h2 class="h5 fw-bold mb-4 text-dark text-opacity-75">Статистика и Топы</h2>

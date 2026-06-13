@@ -42,6 +42,7 @@ let currentFilter = null;
 let currentUser = null; 
 let unsubscribeSnapshot = null; 
 let currentFormTags = []; 
+let targetUserId = null; // ID пользователя, чей список мы сейчас смотрим
 
 // --- ДОМ-ЭЛЕМЕНТЫ ---
 const screenWelcome = document.getElementById('screen-welcome');
@@ -73,7 +74,12 @@ const tagInput = document.getElementById('tag-input');
 const searchInput = document.getElementById('search-input');
 const sortSelect = document.getElementById('sort-select');
 
-// --- ЛОГИКА АВТОРИЗАЦИИ ---
+// Элементы шеринга
+const btnShareCatalog = document.getElementById('btn-share-catalog');
+const shareModeBadge = document.getElementById('share-mode-badge');
+const btnExitShare = document.getElementById('btn-exit-share');
+
+// --- ЛОГИКА АВТОРИЗАЦИИ И ШЕРИНГА ---
 async function login() {
     try {
         await signInWithPopup(auth, provider);
@@ -85,11 +91,70 @@ async function login() {
 
 btnLogin.addEventListener('click', login);
 btnLoginWelcome.addEventListener('click', login);
-btnLogout.addEventListener('click', () => signOut(auth));
+btnLogout.addEventListener('click', () => {
+    signOut(auth).then(() => {
+        // При выходе очищаем параметры просмотра, если они были
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.reload();
+    });
+});
+
+// Проверка параметров ссылки на режим просмотра (view)
+function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('view');
+}
+
+// Запуск слушателя базы данных Firestore для конкретного пользователя
+function initFirebaseListener(userId) {
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+
+    const userQuery = query(foodCollection, where("userId", "==", userId));
+    unsubscribeSnapshot = onSnapshot(userQuery, (snapshot) => {
+        foodList = [];
+        snapshot.forEach((doc) => {
+            foodList.push({ id: doc.id, ...doc.data() });
+        });
+        if (!screenList.classList.contains('hidden')) renderCards();
+        if (!screenStats.classList.contains('hidden')) renderStats();
+    });
+}
 
 onAuthStateChanged(auth, (user) => {
-    if (user) {
+    const viewParamId = checkUrlParams();
+
+    if (viewParamId) {
+        // --- РЕЖИМ ПРОСМОТРА ЧУЖОГО СПИСКА ---
+        targetUserId = viewParamId;
+        shareModeBadge.classList.remove('hidden');
+        navFormBtn.classList.add('hidden'); // Скрываем вкладку добавления для гостя
+        
+        // Показываем интерфейс приложения (авторизация не обязательна для просмотра)
+        screenWelcome.classList.add('hidden');
+        appContent.classList.remove('hidden');
+        
+        if (user) {
+            currentUser = user;
+            btnLogin.classList.add('hidden');
+            authNavLinks.classList.remove('hidden');
+            btnLogout.classList.remove('hidden');
+        } else {
+            currentUser = null;
+            btnLogin.classList.remove('hidden');
+            authNavLinks.classList.add('hidden');
+            btnLogout.classList.add('hidden');
+        }
+
+        switchScreen(screenList, navListBtn);
+        initFirebaseListener(targetUserId);
+
+    } else if (user) {
+        // --- ОБЫЧНЫЙ РЕЖИМ (СВОЙ КАТАЛОГ) ---
         currentUser = user;
+        targetUserId = user.uid;
+        shareModeBadge.classList.add('hidden');
+        navFormBtn.classList.remove('hidden');
+        
         screenWelcome.classList.add('hidden');
         btnLogin.classList.add('hidden');
         appContent.classList.remove('hidden');
@@ -98,20 +163,12 @@ onAuthStateChanged(auth, (user) => {
         
         switchScreen(screenForm, navFormBtn);
         resetFormMode();
+        initFirebaseListener(targetUserId);
 
-        const userQuery = query(foodCollection, where("userId", "==", user.uid));
-        if (unsubscribeSnapshot) unsubscribeSnapshot();
-
-        unsubscribeSnapshot = onSnapshot(userQuery, (snapshot) => {
-            foodList = [];
-            snapshot.forEach((doc) => {
-                foodList.push({ id: doc.id, ...doc.data() });
-            });
-            if (!screenList.classList.contains('hidden')) renderCards();
-            if (!screenStats.classList.contains('hidden')) renderStats();
-        });
     } else {
+        // --- ПОЛЬЗОВАТЕЛЬ НЕ ВОШЕЛ И ССЫЛКИ НЕТ ---
         currentUser = null;
+        targetUserId = null;
         foodList = [];
         if (unsubscribeSnapshot) unsubscribeSnapshot();
         appContent.classList.add('hidden');
@@ -120,6 +177,28 @@ onAuthStateChanged(auth, (user) => {
         screenWelcome.classList.remove('hidden');
         btnLogin.classList.remove('hidden');
     }
+});
+
+// Кнопка выхода из режима просмотра в свой каталог
+btnExitShare.addEventListener('click', () => {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    window.location.reload();
+});
+
+// Кнопка «Поделиться списком»
+btnShareCatalog.addEventListener('click', () => {
+    if (!targetUserId) return;
+    
+    // Формируем уникальную ссылку на базе текущего ID каталога
+    const shareUrl = `${window.location.origin}${window.location.pathname}?view=${targetUserId}`;
+    
+    // Копируем в буфер обмена телефона/ПК
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('Ссылка на ваш гастро-каталог успешно скопирована! Отправьте её друзьям 🍽️');
+    }).catch(err => {
+        console.error('Не удалось скопировать: ', err);
+        alert(`Скопируйте эту ссылку вручную:\n${shareUrl}`);
+    });
 });
 
 // --- НАВИГАЦИЯ ---
@@ -198,7 +277,7 @@ function renderFormChips() {
         tagsContainer.insertBefore(chip, tagInput);
     });
     
-    tagInput.placeholder = currentFormTags.length > 0 ? "" : "Напишите тег и нажмите запятую..." ;
+    tagInput.placeholder = currentFormTags.length > 0 ? "" : "Напишите тег и нажмите запятую...";
 }
 
 tagsContainer.addEventListener('click', () => tagInput.focus());
@@ -270,7 +349,6 @@ function renderCards() {
         processedList = processedList.filter(food => food.tags.includes(currentFilter));
     }
 
-    // Живой поиск: ищет по Названию, Заметке или Месту
     const searchQuery = searchInput.value.trim().toLowerCase();
     if (searchQuery) {
         processedList = processedList.filter(food => {
@@ -295,7 +373,7 @@ function renderCards() {
                 renderCards();
             });
         } else {
-            cardsContainer.innerHTML = '<div class="alert alert-secondary">Вы пока не добавили ни одного блюда.</div>';
+            cardsContainer.innerHTML = '<div class="alert alert-secondary">В этом каталоге пока нет блюд.</div>';
         }
         return;
     }
@@ -321,6 +399,11 @@ function renderCards() {
         return 0;
     });
 
+    // Проверяем, является ли текущий авторизованный юзер хозяином этого списка
+    const isOwner = currentUser && (currentUser.uid === targetUserId);
+    // Если параметров ссылки нет, а пользователь авторизован — это его личный список
+    const showControls = !checkUrlParams() ? true : isOwner;
+
     processedList.forEach(food => {
         const card = document.createElement('div');
         card.className = 'card custom-card food-item-card p-4 mb-3'; 
@@ -338,10 +421,12 @@ function renderCards() {
             <div class="mb-1" style="margin-right: -4px;">${tagsHTML}</div>
             ${food.comment ? `<p class="card-text text-muted small fst-italic border-top pt-2 mt-3 mb-0" style="color: #636e72 !important;">${food.comment}</p>` : ''}
             
+            ${showControls ? `
             <div class="card-actions-container">
                 <button class="btn-card-action btn-card-edit btn-edit" data-id="${food.id}">✏️ Редактировать</button>
                 <button class="btn-card-action btn-card-delete btn-delete" data-id="${food.id}">🗑️ Удалить</button>
             </div>
+            ` : ''}
         `;
 
         cardsContainer.appendChild(card);
@@ -354,7 +439,6 @@ function renderCards() {
         });
     });
 
-    // Клик по названию места автоматически подставляет его в поиск
     cardsContainer.querySelectorAll('.card-place-info').forEach(placeEl => {
         placeEl.addEventListener('click', (e) => {
             const placeName = e.currentTarget.getAttribute('data-place');
@@ -363,13 +447,15 @@ function renderCards() {
         });
     });
 
-    cardsContainer.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', (e) => editFood(e.target.getAttribute('data-id')));
-    });
+    if (showControls) {
+        cardsContainer.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => editFood(e.target.getAttribute('data-id')));
+        });
 
-    cardsContainer.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => deleteFood(e.target.getAttribute('data-id')));
-    });
+        cardsContainer.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => deleteFood(e.target.getAttribute('data-id')));
+        });
+    }
 }
 
 // --- УДАЛЕНИЕ ---
@@ -411,7 +497,7 @@ function renderStats() {
     topDishesContainer.innerHTML = '';
 
     if (foodList.length === 0) {
-        statsContainer.innerHTML = '<div class="col-12"><div class="alert alert-secondary m-0">Добавьте хотя бы одно блюдо, чтобы появилась статистика.</div></div>';
+        statsContainer.innerHTML = '<div class="col-12"><div class="alert alert-secondary m-0">В этом каталоге пока нет блюд для расчета статистики.</div></div>';
         return;
     }
 
