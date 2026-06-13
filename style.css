@@ -467,3 +467,7 @@ input::placeholder, textarea::placeholder {
     border-color: var(--brand-color) !important;
     box-shadow: 0 4px 10px rgba(255, 107, 107, 0.15);
 }
+
+.text-brand {
+    color: var(--brand-color) !important;
+}

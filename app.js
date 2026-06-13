@@ -79,6 +79,8 @@ const btnShareCatalog = document.getElementById('btn-share-catalog');
 const shareModeBadge = document.getElementById('share-mode-badge');
 const btnExitShare = document.getElementById('btn-exit-share');
 
+const appLoadingSpinner = document.getElementById('app-loading-spinner');
+
 // --- ЛОГИКА АВТОРИЗАЦИИ И ШЕРИНГА ---
 async function login() {
     try {
@@ -123,13 +125,15 @@ function initFirebaseListener(userId) {
 onAuthStateChanged(auth, (user) => {
     const viewParamId = checkUrlParams();
 
+    // Мгновенно прячем стартовый лоадер, как только Firebase дал ответ
+    if (appLoadingSpinner) appLoadingSpinner.classList.add('hidden');
+
     if (viewParamId) {
         // --- РЕЖИМ ПРОСМОТРА ЧУЖОГО СПИСКА ---
         targetUserId = viewParamId;
         shareModeBadge.classList.remove('hidden');
-        navFormBtn.classList.add('hidden'); // Скрываем вкладку добавления для гостя
+        navFormBtn.classList.add('hidden');
         
-        // Показываем интерфейс приложения (авторизация не обязательна для просмотра)
         screenWelcome.classList.add('hidden');
         appContent.classList.remove('hidden');
         
@@ -174,6 +178,8 @@ onAuthStateChanged(auth, (user) => {
         appContent.classList.add('hidden');
         authNavLinks.classList.add('hidden');
         btnLogout.classList.add('hidden');
+        
+        // Показываем экран входа только если юзер точно не авторизован
         screenWelcome.classList.remove('hidden');
         btnLogin.classList.remove('hidden');
     }

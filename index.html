@@ -39,8 +39,13 @@
     </nav>
 
     <main class="container" style="max-width: 650px;">
-        
-        <section id="screen-welcome" class="card custom-card p-5 text-center shadow-sm">
+        <div id="app-loading-spinner" class="d-flex flex-column align-items-center justify-content-center my-5 py-5">
+            <div class="spinner-border text-brand" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="text-muted small mt-3 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Проверка авторизации...</p>
+        </div>
+        <section id="screen-welcome" class="card custom-card p-5 text-center shadow-sm hidden">
             <h2 class="fw-bold mb-3">Добро пожаловать в RateThePlate! 🍽️</h2>
             <p class="text-muted mb-4">Открывайте новые вкусы, ведите личный гастрономический дневник, ставьте оценки и синхронизируйте свои блюда между всеми устройствами.</p>
             <button id="btn-login-welcome" class="btn btn-brand py-2.5 px-4 fs-6">Войти через Google-аккаунт</button>
