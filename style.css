@@ -449,3 +449,21 @@ input::placeholder, textarea::placeholder {
 .card-place-info:hover {
     background-color: rgba(255, 107, 107, 0.1);
 }
+
+/* Кастомная кнопка Поделиться списком */
+#btn-share-catalog {
+    color: var(--brand-color) !important;
+    border-color: rgba(255, 107, 107, 0.3) !important;
+    background-color: transparent !important;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 6px 14px;
+    transition: all 0.2s ease;
+}
+
+#btn-share-catalog:hover {
+    background-color: var(--brand-color) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.15);
+}
